@@ -77,8 +77,7 @@ def call_openai_api(endpoint: str, data: dict):
     response = requests.post(url, headers=headers, json=data)
     return response.json()
 
-@app.post("/proxy_openai_api/completions/",
-          description="Generate completions for a given prompt using the GPT-3.5-turbo model.")
+@app.post("/proxy_openai_api/completions/", description="Generate completions for a given prompt using the GPT-3.5-turbo model.")
 async def proxy_openai_api_completions(completion_request: CompletionRequest):
     data = {
         "model": completion_request.model,
@@ -91,7 +90,10 @@ async def proxy_openai_api_completions(completion_request: CompletionRequest):
         "n": completion_request.n,
         "stream": completion_request.stream,
     }
-    return call_openai_api("chat/completions", data)
+    try:
+        return call_openai_api("chat/completions", data)
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/proxy_openai_api/files/",
          description="List all files that have been uploaded to the OpenAI API.")
